@@ -1,48 +1,44 @@
 # UltraTTBot :rocket:
 
-this is a telegram bot which provides you with 2 things:
-1. downloading media from 3 platforms: Youtube - Tiktok - Reddit
-2. playing blackjack game with in game money and other cool stuff related to it.
-3. channel admin helper.
+Introducing a versatile Telegram bot that brings together entertainment and utility in a single, convenient package. This feature-packed bot allows you to *download media from popular platforms like TikTok, Reddit, and YouTube.* But that's not all - you can also *enjoy a thrilling game of blackjack* with your friends, complete with a built-in money transfer system that lets you easily send and receive funds.
+
+To add more fun and competition to your group chats, the bot also features a leaderboard that displays who among your friends has the most money. You can easily compare your bank account with your friends and see who's the richest in the group.
+
+But the bot isn't just about fun and games. *It also provides channel admins with a suite of powerful tools* to help them manage their content. With the ability to trim and watermark videos, admins can ensure that their content is protected and stands out from the crowd. Additionally, certain features of the bot can be restricted to channel members only, adding an extra layer of security and exclusivity.
+
+Furthermore, the bot includes a unique feature that lets admins send media to their audience with a time limit. This means that after a set amount of time, the media will be automatically deleted, ensuring that sensitive content is kept secure.
+
+With all these amazing features and more, this Telegram bot is the ultimate all-in-one solution for your media, gaming, and content management needs. Give it a try today and see how it can elevate your Telegram experience!
 
 
-## 1. media downloader aspect:
+## 1. Media Downloader:
 
-for the first part you will be able to download media from those 3 platfrom except reddit without needing anythin extra.
-you just provide the link to the bot and will get the video as the result.
-API used for TikTok is made by Evil0ctal and can be found [here](https://github.com/Evil0ctal/Douyin_TikTok_Download_API/blob/main/scraper.py). but the rest of the project code was written by me completly.
+For the first part, you will be able to download media from those 3 platforms except Reddit without needing anything extra. You just provide the link to the bot and will get the video as the result. The API used for TikTok is made by Evil0ctal and can be found [here](https://github.com/Evil0ctal/Douyin_TikTok_Download_API/blob/main/scraper.py). But the rest of the project code was written by me completely.
 
+For using the Reddit downloader, you would need to get a Reddit key by visiting [this page on Reddit](https://www.reddit.com/prefs/apps). Fill the RedditKey value in the .env file of the project with the key you get after registering for a new app on the mentioned URL.
 
-for using the reddit downloader you would need to get a reddit key by visiting [this page](https://www.reddit.com/prefs/apps) on reddit! fill the `RedditKey` value in `.env` file of the project with key you get after registring for a new app on the mentioned URL.
+![App Registring](stuff/reddit_key.jpg)
 
-![alt text](stuff/reddit_key.jpg)
+Also fill the RedditUser and RedditPass too, which are your Reddit username and password respectively.
 
-also fill the `RedditUser` and `RedditPass` too which are your reddit username and password respectfully.
+Feel free to send links from all three platforms and see how the bot responds/handles them.
 
+*Use the /help_media command in the bot for more information.*
 
-feel free to send links from all three platforms and see how bot respond/handles them.
+## 2.BlackJack and Economy:
 
-*use /help_media command in bot for more information*
+BlackJack is a famous card game which you can try with your friends in groups using this bot. [game rules](https://www.officialgamerules.org/blackjack).
 
-## 2. BlackJack game aspect:
+By playing each game with your bot, you will either lose or gain money. You can see your placement among other group members in chat and send and receive money from your friends. Ran out of money? Don't worry, you can always get some more every hour by using the /collect command.
 
-BlackJack is a famous card game which you can try with your friends in groups using this bot.
-[Game rules.](https://www.officialgamerules.org/blackjack)
+Deposit your money and play with your cash in hand in order to get richer and avoid getting broke. Word of advice? Don't get greedy!
 
-by playing each game with your bot you will either lose or gain money.
-you can see your placement among other group members in chat and send and recieve money from your friends.
-ran out of money? dont worry you can always get some more every hour by using /collect command.
+*Use the /help_game command in the bot for more information.*
 
-deposit your money and play with your cash in hand in order to get richer and avoid getting broke.
-Word of advice? don't get greedy!
+## 3.A Handy Tool for Admins:
 
-*use /help_game command in bot for more information*
+There are some extra functionalities with users that are introduced as admins to the bot. Those functionalities are accessible for anyone who uses this project, and bot_admin filter was commented out for the sake of this project. But of course, you can uncomment them and test them as you wish.
 
-## 3. channel admin helper.
+There are lots of functionalities this bot provides for channel admins including watermarking videos, checking channel membership of bot users, trimming videos, sending media to the audience with a time limit, and some more.
 
-there are some extra functionality with users that are introduced as admins to the bot. those functionality are accessible for anyone who use this project and `bot_admin` filter was commented out for the sake of this project.
-But ofcourse you can uncomment them and test them as you wish.
-
-there are lots of functionalities this bot provides for channel admins including: watermarking videos - checking channel membership of bot users - trimming videos - sending media to audiance with a time limit and some more ...
-
-*use /help_admin command in bot for more information*
+*Use the /help_admin command in the bot for more information.*
