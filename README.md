@@ -1,4 +1,4 @@
-# UltraTTBot :rocket:
+# UltraTTBot :rocket::robot:
 
 This bot's abilities can be divided into 3 parts:
 
