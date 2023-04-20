@@ -27,6 +27,7 @@ TTBotToken = ''
 ```
 Database used in this project is MongoDB, make sure to connect your MongoDB by filling `MONGODB_PWD`, `MONGODB_URI` which 
 are password and connection string respectively.
+
 And ofcourse don't forget to get your bot's Token from [BotFather](https://t.me/BotFather).
 
 Feel free to send links from all three platforms and see how the bot responds/handles them.
