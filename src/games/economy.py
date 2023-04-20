@@ -67,7 +67,6 @@ def lb_next(call: CallbackQuery):
         if last_num == i:
             break
         last_num += 1
-    # print(f'total: {len(lb)}===last printed: {last_num}')
     data = {'⬅️ Prev': 'Previous'}
     if len(lb) != last_num:
         data.update({'➡️': 'Next'})
@@ -88,7 +87,6 @@ def lb_previous(call: CallbackQuery):
         if first_num == i:
             break
         i += 1
-    # print(f'total: {len(lb)}===last printed: {last_num}')
     data = {'Next ➡️': 'Next'}
     first_num = int(result.split('.')[0])
     if first_num != 1:
