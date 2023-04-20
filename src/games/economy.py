@@ -8,10 +8,6 @@ import datetime
 import humanize
 
 
-
-ecoComs = ['lb', 'leaderboard']
-
-
 @ bot.message_handler(commands=['bal', 'ballance'])
 def ballance(msg):
     chatid = msg.chat.id
@@ -223,7 +219,7 @@ def broke(msg):
     bot.reply_to(msg, f"Currently only {hcode('/col')} and {hcode('/collect')} are available.")
 
 
-@ bot.message_handler(commands=ecoComs, chat_types=["private"])
+@ bot.message_handler(commands=['lb', 'leaderboard'], chat_types=["private"])
 def ingp(msg):
     bot.reply_to(msg, '❌ This command is only to be used in a groups!')
     
