@@ -25,6 +25,8 @@ RedditUser = ''
 RedditPass = ''
 TTBotToken = ''
 ```
+Database used in this project is MongoDB, make sure to connect your MongoDB by filling `MONGODB_PWD`, `MONGODB_URI` which 
+are password and connection string respectively.
 
 Feel free to send links from all three platforms and see how the bot responds/handles them.
 
