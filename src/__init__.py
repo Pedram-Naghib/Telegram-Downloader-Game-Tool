@@ -8,7 +8,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
-CLIENT_ID = '' #ToDo
+CLIENT_ID = os.environ['ClientID']
 
 def reddit_config():
     auth = req.auth.HTTPBasicAuth(CLIENT_ID, os.environ['RedditKey'])
@@ -25,7 +25,7 @@ def reddit_config():
     headers['Authorization'] = f'bearer {REDDIT_TOKEN}'
     return headers
 
-TOKEN = '' # Token obtained from https://t.me/BotFather
+TOKEN = os.environ['TTBotToken'] # Token obtained from https://t.me/BotFather
 state_storage = StateMemoryStorage()
 bot = TeleBot(TOKEN, parse_mode='HTML', state_storage=state_storage)
 
