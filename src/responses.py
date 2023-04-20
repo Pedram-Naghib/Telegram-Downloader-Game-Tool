@@ -332,7 +332,7 @@ def watermark(msg: types.Message):
     constants.clean_folder(fuid)
 
 
-@bot.message_handler(commands=["link"], chat_types=["private"])
+@bot.message_handler(commands=["link"], chat_types=["private"])#, bot_admin=True
 def link_command(msg):
     userid = msg.from_user.id
     try:
