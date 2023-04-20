@@ -8,7 +8,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
-CLIENT_ID = '2CBGT-ohT9iZYAZYarViHg'
+CLIENT_ID = '' #ToDo
 
 def reddit_config():
     auth = req.auth.HTTPBasicAuth(CLIENT_ID, os.environ['RedditKey'])
