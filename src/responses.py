@@ -343,8 +343,8 @@ def link_command(msg):
         bot.send_message(userid, 'Please reply this command to a media!')
         
         
-@bot.message_handler(commands=["ids"])
-def send_all(msg):
+@bot.message_handler(commands=["users"])
+def users(msg):
     if msg.from_user.id == 247768888:
         arg = msg.text.split(" ")
         action = {"user": mongo.user_ids()[0], "id": mongo.user_ids()[1]}
@@ -355,12 +355,6 @@ def send_all(msg):
             f.write(str(result))
         with open('users.txt', 'r') as f:
             bot.send_document(msg.chat.id, f)
-            # bot.reply_to(msg, f"{str(result)}\n{len(result)}")
-
-
-@ bot.message_handler(commands=['msgid'])
-def mid(msg):
-    bot.send_message(msg.chat.id, msg.reply_to_message.message_id)
     
 
 @bot.message_handler(regexp="^❌ Cancel$") # , bot_admin=True
