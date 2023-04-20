@@ -146,7 +146,7 @@ def withdraw(msg):
     try:
         amount = int(args[1])
     except ValueError:
-        if amount := args[1].lower() != 'all':
+        if args[1].lower() != 'all':
             bot.reply_to(msg,
                 f"{hbold('❌ Amount of bet most be in integer!')}\nExample:\n{hcode('/wid 100')}\nOr\n{hcode('/withdraw 200')}")       
             return
@@ -170,7 +170,7 @@ def deposit(msg):
     try:
         amount = int(args[1])
     except ValueError:
-        if amount := args[1].lower() != 'all':
+        if args[1].lower() != 'all':
             bot.reply_to(msg,
                 f"{hbold('❌ Amount of bet most be in integer!')}\nExample:\n{hcode('/dep 100')}\nOr\n{hcode('/deposit 200')}")       
             return
@@ -195,7 +195,7 @@ def send_user(msg: Message):
     try:
         amount = int(args[1])
     except ValueError:
-        if amount := args[1].lower() != 'all': #* delete amount := from all of them.
+        if args[1].lower() != 'all':
             bot.reply_to(msg,
                 f"{hbold('❌ Amount to be sent most be in integer!')}\nExample:\n{hcode('/send <amount>')}")
             return
