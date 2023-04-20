@@ -123,7 +123,8 @@ def echo(msg):
     if IsAdmin.check(msg) and msg.chat.type == "private":
         text += "\n/cut S.xxx - Cut S seconds and xxx miliseconds from end of the video.\
 \n/watermark - Wtermark the video which the command was replied to.\
-\n/link - Get a link for the replied media to send with a time limit."
+\n/link - Get a link for the replied media to send with a time limit.\
+\n/users id and /users user - Get all of bot user usernames(user) or ids(id)"
     bot.send_message(
         msg.chat.id, text)
 
