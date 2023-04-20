@@ -11,11 +11,11 @@ This bot's abilities can be divided into 3 parts:
 
 For the first part, you will be able to download media from those 3 platforms except Reddit without needing anything extra. You just provide the link to the bot and will get the video as the result. The API used for TikTok is made by Evil0ctal and can be found [here](https://github.com/Evil0ctal/Douyin_TikTok_Download_API/blob/main/scraper.py). But the rest of the project code was written by me completely.
 
-For using the Reddit downloader, you would need to get a Reddit key by visiting [this page on Reddit](https://www.reddit.com/prefs/apps). Fill the RedditKey value in the **.env** file of the project with the key you get after registering for a new app on the mentioned URL.
+For using the Reddit downloader, you would need to get a Reddit key by visiting [this page on Reddit](https://www.reddit.com/prefs/apps). Fill the `RedditKey` value in the **.env** file of the project with the key you get after registering for a new app on the mentioned URL.
 
 ![App Registring](stuff/reddit_key.jpg)
 
-Also fill the RedditUser and RedditPass too, which are your Reddit username and password respectively.
+Also fill the `RedditUser` and `RedditPass` too, which are your Reddit username and password respectively.
 
 ```.env
 MONGODB_PWD = ''
@@ -27,6 +27,7 @@ TTBotToken = ''
 ```
 Database used in this project is MongoDB, make sure to connect your MongoDB by filling `MONGODB_PWD`, `MONGODB_URI` which 
 are password and connection string respectively.
+And ofcourse don't forget to get your bot's Token from [BotFather](https://t.me/BotFather).
 
 Feel free to send links from all three platforms and see how the bot responds/handles them.
 
