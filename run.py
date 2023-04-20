@@ -5,7 +5,7 @@ import os
 #ToDo: explain about running the code
 if __name__ == "__main__":
     # if you want to run this bot on your system rather than on a hosting service
-    # comment out next 2 lines and uncooment last two lines
+    # comment out next 2 lines and uncomment the last two ones.
     # server.run(host="0.0.0.0", port=8080)
     # logger.info("Bot Started")
 
