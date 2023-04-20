@@ -151,32 +151,7 @@ def start(msg):
 @bot.message_handler(commands=["help"])
 def help(msg: types.Message):
     bot.send_message(msg.chat.id, constants.help, 'MarkdownV2')
- 
- 
-@bot.message_handler(commands=["link"], chat_types=["private"])
-def link_command(msg):
-    userid = msg.from_user.id
-    try:
-        fileid = msg.reply_to_message.video.file_id
-        msgid = msg.reply_to_message.message_id
-        send_post_link([msgid, userid, fileid], False)
-    except AttributeError:
-        bot.send_message(userid, 'Please reply this command to a media!')
-        
-        
-@bot.message_handler(commands=["ids"])
-def send_all(msg):
-    if msg.from_user.id == 247768888:
-        arg = msg.text.split(" ")
-        action = {"user": mongo.user_ids()[0], "id": mongo.user_ids()[1]}
-        result = action.get(
-            arg[1], "Wrong command argument! use 'user' or 'id'"
-        )
-        with open('users.txt', 'w') as f:
-            f.write(str(result))
-        with open('users.txt', 'r') as f:
-            bot.send_document(msg.chat.id, f)
-            # bot.reply_to(msg, f"{str(result)}\n{len(result)}")
+
 
 @bot.message_handler(commands=["myid"])
 def msgid(msg: types.Message):
@@ -355,6 +330,32 @@ def watermark(msg: types.Message):
         bot.send_video(msg.chat.id, video, duration, width, caption=cap)
     
     constants.clean_folder(fuid)
+
+
+@bot.message_handler(commands=["link"], chat_types=["private"])
+def link_command(msg):
+    userid = msg.from_user.id
+    try:
+        fileid = msg.reply_to_message.video.file_id
+        msgid = msg.reply_to_message.message_id
+        send_post_link([msgid, userid, fileid], False)
+    except AttributeError:
+        bot.send_message(userid, 'Please reply this command to a media!')
+        
+        
+@bot.message_handler(commands=["ids"])
+def send_all(msg):
+    if msg.from_user.id == 247768888:
+        arg = msg.text.split(" ")
+        action = {"user": mongo.user_ids()[0], "id": mongo.user_ids()[1]}
+        result = action.get(
+            arg[1], "Wrong command argument! use 'user' or 'id'"
+        )
+        with open('users.txt', 'w') as f:
+            f.write(str(result))
+        with open('users.txt', 'r') as f:
+            bot.send_document(msg.chat.id, f)
+            # bot.reply_to(msg, f"{str(result)}\n{len(result)}")
 
 
 @ bot.message_handler(commands=['msgid'])
