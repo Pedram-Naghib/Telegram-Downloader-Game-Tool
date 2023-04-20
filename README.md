@@ -23,6 +23,7 @@ MONGODB_URI = ''
 RedditKey = ''
 RedditUser = ''
 RedditPass = ''
+ClientID = ''
 TTBotToken = ''
 ```
 Database used in this project is MongoDB, make sure to connect your MongoDB by filling `MONGODB_PWD`, `MONGODB_URI` which 
