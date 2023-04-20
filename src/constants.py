@@ -121,7 +121,7 @@ def echo(msg):
     text = f"Hey <strong>{name}</strong>!\nDownload media (up to 50Mb) from Youtube, Tiktok, Reddit by sending me their links.\
 \nUse /help command to findout more about bot game features!"
     if IsAdmin.check(msg) and msg.chat.type == "private":
-        text += "\n/cut S.xxx - Cut S.xxx from end of the video(S is seconds and xxx are miliseconds).\
+        text += "\n/cut S.xxx - Cut S seconds and xxx miliseconds from end of the video.\
 \n/watermark - Wtermark the video which the command was replied to.\
 \n/link - Get a link for the replied media to send with a time limit."
     bot.send_message(
