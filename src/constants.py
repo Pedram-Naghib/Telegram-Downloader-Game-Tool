@@ -118,11 +118,14 @@ def caption(user, hash):
 
 def echo(msg):
     name = msg.chat.first_name
-    if msg.chat.type == "private":
-        bot.send_message(
-            msg.chat.id,
-            f"Hey <strong>{name}</strong>! I can download videos from REDDIT, TIKTOK or YOUTUBE \
-(With the size limit of 50MB) if you send me their links.")
+    text = f"Hey <strong>{name}</strong>!\nDownload media (up to 50Mb) from Youtube, Tiktok, Reddit by sending me their links.\
+\nUse /help command to findout more about bot game features!"
+    if IsAdmin.check(msg) and msg.chat.type == "private":
+        text += "\n/cut S.xxx - Cut S.xxx from end of the video(S is seconds and xxx are miliseconds).\
+\n/watermark - Wtermark the video which the command was replied to.\
+\n/link - Get a link for the replied media to send with a time limit."
+    bot.send_message(
+        msg.chat.id, text)
 
 
 
@@ -190,10 +193,32 @@ def is_channel_member(user_id):
     return True
 
 
+help = '''
+*Blackjack with economy:*
+/blackjack or /bj \- Start a blackjack game in the private or group chat\.
+/roulette \- Play roulette game in the private or group chat\.
+/ballance or /bal \- Check your ballance\.
+/leaderboard or /lb \- Compare your ballance with your friends in a group chat\.
+/updateuser \- Change your name in leaderboard to your new name in telegram\.
+/collect or /col \- Collect 300💵 every hour\.
+/withdraw or /wid \- Withdraw money from your bank account\.
+/deposit or /dep \- Deposit money to your bank account\.
+/send \<amount\> \- Reply this command to someone to send them \<amount\>💵\.
+/broke \- Use this to findout about ways of making money if you ran out\. spoiler: ||only /col is available at the moment\.||
+'''
+
+
 #* -------------------------------------------------------------------------------------------------------------
 #* custom filters
 
 ADMINS = 000 # insert your telegram ID (You can find out yours by using /myid command in bot)
+
+
+class IsAdmin(custom_filters.SimpleCustomFilter):
+    key='bot_admin'
+    @staticmethod
+    def check(message: Message):
+        return message.chat.id in ADMINS
 
 
 class ValidCall(custom_filters.AdvancedCustomFilter):
