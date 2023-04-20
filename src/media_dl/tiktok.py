@@ -445,7 +445,6 @@ async def get_data(url: str) -> dict:
 # Rest of the code was written by me
 
 from src.constants import(
-    IsAdmin,
     clean_folder,
     proc_keys
 )
