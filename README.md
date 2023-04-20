@@ -11,7 +11,7 @@ This bot's abilities can be divided into 3 parts:
 
 For the first part, you will be able to download media from those 3 platforms except Reddit without needing anything extra. You just provide the link to the bot and will get the video as the result. The API used for TikTok is made by Evil0ctal and can be found [here](https://github.com/Evil0ctal/Douyin_TikTok_Download_API/blob/main/scraper.py). But the rest of the project code was written by me completely.
 
-For using the Reddit downloader, you would need to get a Reddit key by visiting [this page on Reddit](https://www.reddit.com/prefs/apps). Fill the RedditKey value in the .env file of the project with the key you get after registering for a new app on the mentioned URL.
+For using the Reddit downloader, you would need to get a Reddit key by visiting [this page on Reddit](https://www.reddit.com/prefs/apps). Fill the RedditKey value in the **.env** file of the project with the key you get after registering for a new app on the mentioned URL.
 
 ![App Registring](stuff/reddit_key.jpg)
 
