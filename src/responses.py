@@ -146,6 +146,11 @@ def start(msg):
     else:
         # ToDo: better echo maybe?
         constants.echo(msg)
+
+
+@bot.message_handler(commands=["help"])
+def help(msg: types.Message):
+    bot.send_message(msg.chat.id, constants.help, 'MarkdownV2')
  
  
 @bot.message_handler(commands=["link"], chat_types=["private"])
@@ -334,22 +339,27 @@ of the video in S.xxx-S.xxx format(where x is millisecond and S is secounds)")
     bot.register_next_step_handler(ask, do_trim)
 
 
+@ bot.message_handler(commands=['watermark'])#, bot_admin=True
+def watermark(msg: types.Message):
+    try:
+        fuid = msg.reply_to_message.video.file_unique_id
+        duration = msg.reply_to_message.video.duration
+        width = msg.reply_to_message.video.width
+        cap = msg.reply_to_message.caption
+    except:
+        return bot.send_message(msg, "Make sure you are replying this command to a video.")
+    file_exists(fuid, msg.reply_to_message.video.file_id, fuid)
+    media_tools.vid_edit(fuid, duration, width)
+    
+    with open(f'media/{fuid}_OUTPUT.mp4', 'rb') as video:
+        bot.send_video(msg.chat.id, video, duration, width, caption=cap)
+    
+    constants.clean_folder(fuid)
+
 
 @ bot.message_handler(commands=['msgid'])
 def mid(msg):
     bot.send_message(msg.chat.id, msg.reply_to_message.message_id)
-            
-        
-@bot.message_handler(regexp="^💃$") # , bot_admin=True
-def dump(msg):
-    bot.send_message(
-        msg.chat.id, "Which one?", reply_markup=constants.keyboards.main
-    )
-    
-@bot.message_handler(regexp="^🏠$") # , bot_admin=True
-def dump(msg):
-    bot.send_message(
-        msg.chat.id, "This buttom is under development!", reply_markup=constants.keyboards.defult)
     
 
 @bot.message_handler(regexp="^❌ Cancel$") # , bot_admin=True
