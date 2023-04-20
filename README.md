@@ -17,6 +17,15 @@ For using the Reddit downloader, you would need to get a Reddit key by visiting 
 
 Also fill the RedditUser and RedditPass too, which are your Reddit username and password respectively.
 
+```.env
+MONGODB_PWD = ''
+MONGODB_URI = ''
+RedditKey = ''
+RedditUser = ''
+RedditPass = ''
+TTBotToken = ''
+```
+
 Feel free to send links from all three platforms and see how the bot responds/handles them.
 
 *Use the /help_media command in the bot for more information.*
