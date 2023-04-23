@@ -18,6 +18,11 @@ def vid_dl(url4, url3, chatid, postid, title, data=None):
         urllib.request.urlretrieve(url4, filename=mp4)
         send = bot.send_animation
 
+    elif url3 == 'image':
+        mp4 = f'media/@_{chatid}_{postid}.jpg'
+        urllib.request.urlretrieve(url4, filename=mp4)
+        send = bot.send_photo
+
     elif url3 == 'video':
         mp4 = f'media/@_{chatid}_{postid}.mp4'
         urllib.request.urlretrieve(url4, filename=mp4)
@@ -33,9 +38,9 @@ def vid_dl(url4, url3, chatid, postid, title, data=None):
         send = bot.send_video
 
 
-    with open(mp4, 'rb') as video:
+    with open(mp4, 'rb') as media:
         bot.send_chat_action(chatid, 'upload_video')
-        send(chatid, video, duration, w, h, thumb, title)
+        send(chatid, media, duration, w, h, thumb, title)
         constants.clean_folder(msg_id=postid)
 
 
