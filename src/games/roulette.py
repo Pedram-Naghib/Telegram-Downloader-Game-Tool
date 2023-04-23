@@ -4,7 +4,7 @@ from telebot.types import Message
 from telebot.formatting import hcode, hbold
 from src.mongo import DB, ecReader, new_player
 import threading
-
+#! this module is work in progress and is not ready yet !
 
 eco_up = DB.economy.update_one
 
