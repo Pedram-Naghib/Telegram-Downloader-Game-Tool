@@ -112,7 +112,7 @@ def utubelink(call: Message):
         msgid2 = change.message_id
 
         mongo.DB.users.update_one(
-            {'id': chatid}, {'$set': {'change.' + f'{msgid}': msgid2}}, upsert=True)
+            {'id': call.from_user.id}, {'$set': {'change.' + f'{msgid}': msgid2}}, upsert=True)
         return
         
 
@@ -150,5 +150,5 @@ def utubelink(call: Message):
     bot.delete_state(vid_id, call.from_user.id)
     constants.clean_folder([msgid, vid_id])
     bot.delete_message(chatid, chooseid)
-    mongo.DB.users.update_one({'id': chatid}, {'$unset': {f'choose.{msgid}': 0}})
+    mongo.DB.users.update_one({'id': call.from_user.id}, {'$unset': {f'choose.{msgid}': 0}})
     return
