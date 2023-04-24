@@ -1,6 +1,7 @@
 from pytube import YouTube
 import pytube.exceptions as exception
 import pytube.extract as extract
+import backoff
 from telebot import formatting, apihelper
 from telebot.types import InputFile, Message
 from src import constants, mongo, bot
@@ -65,6 +66,7 @@ def youtube_handler(msg: Message):
 
 
 @ bot.callback_query_handler(func=None, validator=RESES, is_sender=True)
+@ backoff.on_exception(backoff.expo, (KeyError, exception.PytubeError, ValueError), max_time=60)
 def utubelink(call: Message):
 
     msgid = call.message.reply_to_message.message_id
@@ -88,18 +90,17 @@ def utubelink(call: Message):
     author = vidata['author']
 
     if res == 'audio':
-        audio = utube.streams.get_audio_only()
+        audio, name = utube.streams.get_audio_only(), title
         try:
             audio.download(output_path='media/', filename=f'{title}.mp3')
         except Exception as e: #! which except?
             audio.download(output_path='media/', filename=f'{vid_id}.mp3')
-            title = vid_id
-            print(e)
+            name = vid_id
            
         mongo.DB.users.update_many({'id': chatid}, {'$set':
-            {'tuid': vid_id, 'duration': utube.length,
-                'Utitle': title, 'author': author}}, upsert=True)
-        
+            {'tuid': vid_id, 'duration': utube.length, 'Utitle': title, 'author': author,
+             'filename': name}}, upsert=True)
+
         size = constants.byteconv(audio.filesize)
         hcode = formatting.hcode
         caption = constants.audio_cc(hcode(title), hcode(author), hcode(size))
