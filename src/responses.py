@@ -59,10 +59,10 @@ def name_audio(call):
     msgid = call.data.split("-")[1]
     # Edit the reply markup of a previous message
     bot.edit_message_reply_markup(
-        userid, mongo.reader(userid, "change")[str(msgid)], reply_markup=None
+        chatid, mongo.reader(userid, "change")[str(msgid)], reply_markup=None
     )
     # Retrieve audio title and author from database
-    title = mongo.reader(userid, "Utitle")
+    title, name = mongo.reader(userid, "Utitle"), mongo.reader(userid, "filename")
     author = mongo.reader(userid, "author")
     cap = '@YourBotNameHere'
 
@@ -70,7 +70,7 @@ def name_audio(call):
         # Retrieve audio duration and thumbnail from database
         duration = mongo.reader(userid, "duration")
         tuid = mongo.reader(userid, "tuid")
-        with open(f"media/{title}.mp3", "rb") as aud:
+        with open(f"media/{name}.mp3", "rb") as aud:
             bot.send_audio(call.message.chat.id, aud, cap, duration, author, title,
                 thumb=types.InputFile(f'media/{tuid}.jpg'))
         # Clean up files
