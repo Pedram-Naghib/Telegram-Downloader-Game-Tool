@@ -139,8 +139,9 @@ def change_audio(msg):
         with open(f"media/{orgtitle}.mp3", "rb") as aud:
             bot.send_audio(msg.chat.id, aud, cap, duration, author, title,
                 thumb=types.InputFile(thumb))
-        # Clean media directory from processed files!
-        constants.clean_folder([orgtitle, tuid])
+        # Clean media directory from processed files and checks if orgtitle  tuid are the same.
+        postids = [orgtitle, tuid] if orgtitle != tuid else tuid
+        constants.clean_folder(postids)
     else:
         bot.reply_to(userid,
             "Please make sure you entered audio's name and artist correct and in separate lines!")
