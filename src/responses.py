@@ -156,7 +156,7 @@ def help(msg: types.Message):
 @bot.message_handler(commands=["myid"])
 def msgid(msg: types.Message):
     from telebot.formatting import hcode
-    bot.send_message(msg.chat.id, f'Your telegram ID is:\n{hcode(msg.from_user.id)}')
+    bot.send_message(msg.chat.id, f'Your telegram ID is:\n{hcode(str(msg.from_user.id))}')
 
 #* -------------------------------------------------------------------------------------------------    
 #* others functions
