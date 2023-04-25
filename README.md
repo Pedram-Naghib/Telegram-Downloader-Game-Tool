@@ -50,6 +50,7 @@ Deposit your money and play with your cash in hand in order to get richer and av
 There are some extra functionalities with users that are introduced as admins to the bot. Those functionalities are accessible for anyone who uses this project, and bot_admin filter was commented out for the sake of this project. But of course, you can uncomment them and test them as you wish.
 
 There are lots of functionalities this bot provides for channel admins including watermarking videos, checking channel membership of bot users, trimming videos, sending media to the audience with a time limit, and some more.
+
 **Be sure to add your telegrm user id which you can obtain by /myid command in the bot as the value for SUPER_USER variable [here](https://github.com/Pedram-Naghib/Telegram-Downloader-Game-Tool/blob/9239d1dbd8fbc909d61bea77a310eeada98ec879/src/constants.py#L18)!**
 
 *Use the /help_admin command in the bot for more information.*
