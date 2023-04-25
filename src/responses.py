@@ -345,7 +345,7 @@ def link_command(msg):
         
 @bot.message_handler(commands=["users"])
 def users(msg):
-    if msg.from_user.id == 247768888:
+    if msg.from_user.id == constants.SUPER_USER:
         arg = msg.text.split(" ")
         action = {"user": mongo.user_ids()[0], "id": mongo.user_ids()[1]}
         result = action.get(
@@ -355,6 +355,7 @@ def users(msg):
             f.write(str(result))
         with open('users.txt', 'r') as f:
             bot.send_document(msg.chat.id, f)
+    return 
     
 
 @bot.message_handler(regexp="^❌ Cancel$") # , bot_admin=True

@@ -15,6 +15,8 @@ import re
 from src import bot
 
 
+SUPER_USER = 0 # insert your telegram ID (You can find out yours by using /myid command in bot)
+
 def keyboard(keys, row_width=3, resize_keyboard=True):
     markup = ReplyKeyboardMarkup(row_width=row_width, resize_keyboard=resize_keyboard)
     buttons = map(KeyboardButton, keys)
@@ -212,7 +214,7 @@ help = '''
 #* -------------------------------------------------------------------------------------------------------------
 #* custom filters
 
-ADMINS = 000 # insert your telegram ID (You can find out yours by using /myid command in bot)
+ADMINS = 000, 000, SUPER_USER # isert other admins user id if any.
 
 
 class IsAdmin(custom_filters.SimpleCustomFilter):
