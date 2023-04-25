@@ -14,19 +14,19 @@ from typing import Union
 class Scraper:
     """
     简介/Introduction
-    Scraper.get_url(text: str) -> str or None
+    Scraper.get_url(text: str) -> Union[str, None]
     用于检索出文本中的链接并返回/Used to retrieve the link in the text and return it.
-    Scraper.convert_share_urls(self, url: str) -> str or None\n
+    Scraper.convert_share_urls(self, url: str) -> Union[str, None]\n
     用于转换分享链接为原始链接/Convert share links to original links
-    Scraper.get_douyin_video_id(self, original_url: str) -> str or None\n
+    Scraper.get_douyin_video_id(self, original_url: str) -> Union[str, None]\n
     用于获取抖音视频ID/Get Douyin video ID
-    Scraper.get_douyin_video_data(self, video_id: str) -> dict or None\n
+    Scraper.get_douyin_video_data(self, video_id: str) -> Union[dict, None]\n
     用于获取抖音视频数据/Get Douyin video data
-    Scraper.get_douyin_live_video_data(self, original_url: str) -> str or None\n
+    Scraper.get_douyin_live_video_data(self, original_url: str) -> Union[str, None]\n
     用于获取抖音直播视频数据/Get Douyin live video data
-    Scraper.get_tiktok_video_id(self, original_url: str) -> str or None\n
+    Scraper.get_tiktok_video_id(self, original_url: str) -> Union[str, None]\n
     用于获取TikTok视频ID/Get TikTok video ID
-    Scraper.get_tiktok_video_data(self, video_id: str) -> dict or None\n
+    Scraper.get_tiktok_video_data(self, video_id: str) -> Union[dict, None]\n
     用于获取TikTok视频数据/Get TikTok video data
     Scraper.hybrid_parsing(self, video_url: str) -> dict\n
     用于混合解析/ Hybrid parsing
@@ -39,10 +39,7 @@ class Scraper:
     # 初始化/initialization
     def __init__(self):
         self.headers = {
-            'User-Agent': "Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Mobile Safari/537.36 Edg/87.0.664.66"
-        }
-        self.douyin_cookies = {
-            'Cookie': 'msToken=tsQyL2_m4XgtIij2GZfyu8XNXBfTGELdreF1jeIJTyktxMqf5MMIna8m1bv7zYz4pGLinNP2TvISbrzvFubLR8khwmAVLfImoWo3Ecnl_956MgOK9kOBdwM=; odin_tt=6db0a7d68fd2147ddaf4db0b911551e472d698d7b84a64a24cf07c49bdc5594b2fb7a42fd125332977218dd517a36ec3c658f84cebc6f806032eff34b36909607d5452f0f9d898810c369cd75fd5fb15; ttwid=1%7CfhiqLOzu_UksmD8_muF_TNvFyV909d0cw8CSRsmnbr0%7C1662368529%7C048a4e969ec3570e84a5faa3518aa7e16332cfc7fbcb789780135d33a34d94d2'
+            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
         }
         self.tiktok_api_headers = {
             'User-Agent': 'com.ss.android.ugc.trill/494+Mozilla/5.0+(Linux;+Android+12;+2112123G+Build/SKQ1.211006.001;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/107.0.5304.105+Mobile+Safari/537.36'
@@ -88,7 +85,7 @@ class Scraper:
             return None
 
     # 转换链接/convert url
-    @retry(stop=stop_after_attempt(3), wait=wait_random(min=1, max=2))
+    @retry(stop=stop_after_attempt(4), wait=wait_fixed(7))
     async def convert_share_urls(self, url: str) -> Union[str, None]:
         """
         用于将分享链接(短链接)转换为原始链接/Convert share links (short links) to original links
@@ -100,70 +97,26 @@ class Scraper:
         if url is None:
             print('无法检索到链接/Unable to retrieve link')
             return None
-        # 判断是否为抖音分享链接/judge if it is a douyin share link
-        if 'douyin' in url:
-            """
-            抖音视频链接类型(不全)：
-            1. https://v.douyin.com/MuKhKn3/
-            2. https://www.douyin.com/video/7157519152863890719
-            3. https://www.iesdouyin.com/share/video/7157519152863890719/?region=CN&mid=7157519152863890719&u_code=ffe6jgjg&titleType=title&timestamp=1600000000&utm_source=copy_link&utm_campaign=client_share&utm_medium=android&app=aweme&iid=123456789&share_id=123456789
-            抖音用户链接类型(不全)：
-            1. https://www.douyin.com/user/MS4wLjABAAAAbLMPpOhVk441et7z7ECGcmGrK42KtoWOuR0_7pLZCcyFheA9__asY-kGfNAtYqXR?relation=0&vid=7157519152863890719
-            2. https://v.douyin.com/MuKoFP4/
-            抖音直播链接类型(不全)：
-            1. https://live.douyin.com/88815422890
-            """
-            if 'v.douyin' in url:
-                # 转换链接/convert url
-                # 例子/Example: https://v.douyin.com/rLyAJgf/8.74
-                url = re.compile(r'(https://v.douyin.com/)\w+', re.I).match(url).group()
-                print('正在通过抖音分享链接获取原始链接...')
-                try:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(url, headers=self.headers, proxy=self.proxies, allow_redirects=False,
-                                               timeout=10) as response:
-                            if response.status == 302:
-                                url = response.headers['Location'].split('?')[0] if '?' in response.headers[
-                                    'Location'] else \
-                                    response.headers['Location']
-                                print('获取原始链接成功, 原始链接为: {}'.format(url))
-                                return url
-                except Exception as e:
-                    print('获取原始链接失败！')
-                    print(e)
-                    return None
-            else:
-                print('该链接为原始链接,无需转换,原始链接为: {}'.format(url))
-                return url
-        # 判断是否为TikTok分享链接/judge if it is a TikTok share link
-        elif 'tiktok' in url:
-            """
-            TikTok视频链接类型(不全)：
-            1. https://www.tiktok.com/@tiktok/video/6950000000000000000
-            2. https://www.tiktok.com/t/ZTRHcXS2C/
-            TikTok用户链接类型(不全)：
-            1. https://www.tiktok.com/@tiktok
-            """
-            if '@' in url:
-                print('该链接为原始链接,无需转换,原始链接为: {}'.format(url))
-                return url
-            else:
-                # print('正在通过TikTok分享链接获取原始链接...')   commentout
-                try:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(url, headers=self.headers, proxy=self.proxies, allow_redirects=False,
-                                               timeout=10) as response:
-                            if response.status == 301:
-                                url = response.headers['Location'].split('?')[0] if '?' in response.headers[
-                                    'Location'] else \
-                                    response.headers['Location']
-                                print('获取原始链接成功, 原始链接为: {}'.format(url))
-                                return url
-                except Exception as e:
-                    print('获取原始链接失败！')
-                    print(e)
-                    return None
-
+        # 判断是否为TikTok分享链接/TikTok share link
+        if '@' in url:
+            print('该链接为原始链接,无需转换,原始链接为: {}'.format(url))
+            return url
+        else:
+            print('正在通过TikTok分享链接获取原始链接...')
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, headers=self.headers, proxy=self.proxies, allow_redirects=False,
+                                            timeout=10) as response:
+                        if response.status == 301:
+                            url = response.headers['Location'].split('?')[0] if '?' in response.headers[
+                                'Location'] else \
+                                response.headers['Location']
+                            print('获取原始链接成功, 原始链接为: {}'.format(url))
+                            return url
+            except Exception as e:
+                print('获取原始链接失败！')
+                print(e)
+                return None
 
     """__________________________________________⬇️TikTok methods(TikTok方法)⬇️______________________________________"""
 
@@ -189,27 +142,57 @@ class Scraper:
             print('获取TikTok视频ID出错了:{}'.format(e))
             return None
 
-    @retry(stop=stop_after_attempt(3), wait=wait_random(min=1, max=2))
+    @retry(stop=stop_after_attempt(4), wait=wait_fixed(7))
     async def get_tiktok_video_data(self, video_id: str) -> Union[dict, None]:
         """
         获取单个视频信息
         :param video_id: 视频id
         :return: 视频信息
         """
-        # print('正在获取TikTok视频数据...')   commentout
+        print('正在获取TikTok视频数据...')
         try:
             # 构造访问链接/Construct the access link
             api_url = f'https://api16-normal-c-useast1a.tiktokv.com/aweme/v1/feed/?aweme_id={video_id}'
             print("正在获取视频数据API: {}".format(api_url))
             async with aiohttp.ClientSession() as session:
-                async with session.get(api_url, headers=self.tiktok_api_headers, proxy=self.proxies, timeout=10) as response:
+                async with session.get(api_url, headers=self.tiktok_api_headers, proxy=self.proxies,
+                                       timeout=10) as response:
                     response = await response.json()
                     video_data = response['aweme_list'][0]
-                    # print('获取视频信息成功！') commentout
+                    print('获取视频信息成功！')
                     return video_data
         except Exception as e:
             print('获取视频信息失败！原因:{}'.format(e))
-            return None
+            # return None
+            raise e
+
+    @retry(stop=stop_after_attempt(4), wait=wait_fixed(7))
+    async def get_tiktok_user_profile_videos(self, tiktok_video_url: str, tikhub_token: str) -> Union[dict, None]:
+        try:
+            api_url = f"https://api.tikhub.io/tiktok_profile_videos/?tiktok_video_url={tiktok_video_url}&cursor=0&count=20"
+            _headers = {"Authorization": f"Bearer {tikhub_token}"}
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_url, headers=_headers, proxy=self.proxies, timeout=10) as response:
+                    response = await response.json()
+                    return response
+        except Exception as e:
+            print('获取抖音视频数据失败！原因:{}'.format(e))
+            # return None
+            raise e
+
+    @retry(stop=stop_after_attempt(4), wait=wait_fixed(7))
+    async def get_tiktok_user_profile_liked_videos(self, tiktok_video_url: str, tikhub_token: str) -> Union[dict, None]:
+        try:
+            api_url = f"https://api.tikhub.io/tiktok_profile_liked_videos/?tiktok_video_url={tiktok_video_url}&cursor=0&count=20"
+            _headers = {"Authorization": f"Bearer {tikhub_token}"}
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_url, headers=_headers, proxy=self.proxies, timeout=10) as response:
+                    response = await response.json()
+                    return response
+        except Exception as e:
+            print('获取抖音视频数据失败！原因:{}'.format(e))
+            # return None
+            raise e
 
     """__________________________________________⬇️Hybrid methods(混合方法)⬇️______________________________________"""
 
@@ -219,25 +202,26 @@ class Scraper:
         url_platform = 'douyin' if 'douyin' in video_url else 'tiktok'
         print('当前链接平台为:{}'.format(url_platform))
         # 获取视频ID/Get video ID
-        # print("正在获取视频ID...")
+        print("正在获取视频ID...")
         video_id = await self.get_douyin_video_id(
             video_url) if url_platform == 'douyin' else await self.get_tiktok_video_id(
             video_url)
         if video_id:
             print("获取视频ID成功,视频ID为:{}".format(video_id))
             # 获取视频数据/Get video data
-            # print("正在获取视频数据...")
+            print("正在获取视频数据...")
             data = await self.get_douyin_video_data(
                 video_id) if url_platform == 'douyin' else await self.get_tiktok_video_data(
                 video_id)
             if data:
-                # print("获取视频数据成功，正在判断数据类型...") commentout
+                print("获取视频数据成功，正在判断数据类型...")
                 url_type_code = data['aweme_type']
                 """以下为抖音/TikTok类型代码/Type code for Douyin/TikTok"""
                 url_type_code_dict = {
                     # 抖音/Douyin
                     2: 'image',
                     4: 'video',
+                    68: 'image',
                     # TikTok
                     0: 'video',
                     51: 'video',
@@ -252,7 +236,7 @@ class Scraper:
                 # 判断链接类型/Judge link type
                 url_type = url_type_code_dict.get(url_type_code, 'video')
                 print("数据类型: {}".format(url_type))
-                # print("准备开始判断并处理数据...")  commentout
+                print("准备开始判断并处理数据...")
 
                 """
                 以下为(视频||图片)数据处理的四个方法,如果你需要自定义数据处理请在这里修改.
@@ -275,7 +259,7 @@ class Scraper:
                     'official_api_url':
                         {
                             "User-Agent": self.headers["User-Agent"],
-                            "api_url": f"https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id={video_id}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&Github=Evil0ctal&words=F**K-U-ByteDance"
+                            "api_url": f"https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id={video_id}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&Github=Evil0ctal&words=FXXK_U_ByteDance"
                         } if url_platform == 'douyin'
                         else
                         {
@@ -302,7 +286,7 @@ class Scraper:
                     if url_platform == 'douyin':
                         # 抖音视频数据处理/Douyin video data processing
                         if url_type == 'video':
-                            # print("正在处理抖音视频数据...") commentout
+                            print("正在处理抖音视频数据...")
                             # 将信息储存在字典中/Store information in a dictionary
                             uri = data['video']['play_addr']['uri']
                             wm_video_url = data['video']['play_addr']['url_list'][0]
@@ -320,7 +304,7 @@ class Scraper:
                             }
                         # 抖音图片数据处理/Douyin image data processing
                         elif url_type == 'image':
-                            # print("正在处理抖音图片数据...") commentout
+                            print("正在处理抖音图片数据...")
                             # 无水印图片列表/No watermark image list
                             no_watermark_image_list = []
                             # 有水印图片列表/With watermark image list
@@ -340,7 +324,7 @@ class Scraper:
                     elif url_platform == 'tiktok':
                         # TikTok视频数据处理/TikTok video data processing
                         if url_type == 'video':
-                            # print("正在处理TikTok视频数据...") commentout
+                            print("正在处理TikTok视频数据...")
                             # 将信息储存在字典中/Store information in a dictionary
                             wm_video = data['video']['download_addr']['url_list'][0]
                             api_data = {
@@ -354,7 +338,7 @@ class Scraper:
                             }
                         # TikTok图片数据处理/TikTok image data processing
                         elif url_type == 'image':
-                            # print("正在处理TikTok图片数据...")  commentout
+                            print("正在处理TikTok图片数据...")
                             # 无水印图片列表/No watermark image list
                             no_watermark_image_list = []
                             # 有水印图片列表/With watermark image list
@@ -410,39 +394,17 @@ class Scraper:
             return data
 
 
-"""__________________________________________⬇️Test methods(测试方法)⬇️______________________________________"""
-
-
-# async def async_test(tiktok_url: str = None) -> None:
-#     # 异步测试/Async test
-#     start_time = time.time()
-#     print("正在进行异步测试...")
-
-#     print("正在测试异步获取TikTok视频ID方法...")
-#     tiktok_id = await api.get_tiktok_video_id(tiktok_url)
-#     print("正在测试异步获取TikTok视频数据方法...")
-#     tiktok_data = await api.get_tiktok_video_data(tiktok_id)
-
-#     print("正在测试异步混合解析方法...")
-#     tiktok_hybrid_data = await api.hybrid_parsing(tiktok_url)
-
-#     # 总耗时/Total time
-#     total_time = round(time.time() - start_time, 2)
-#     print("异步测试完成，总耗时: {}s".format(total_time))
-
+# ------------------------end of the code borrowed from Evil0ctal github------------------------------------
+# Rest of the code was written by me
 
 async def get_data(url: str) -> dict:
     api = Scraper()
     # 运行测试
     # tiktok_url = 'https://vt.tiktok.com/ZSRwWXtdr/'
-    tiktok_id = await api.get_tiktok_video_id(url)
-    tiktok_data = await api.get_tiktok_video_data(tiktok_id)
     tiktok_hybrid_data = await api.hybrid_parsing(url)
     return tiktok_hybrid_data
     # asyncio.run(async_test(tiktok_url=tiktok_url))
-
-# ------------------------end of the code borrowed from Evil0ctal github------------------------------------
-# Rest of the code was written by me
+    
 
 from src.constants import(
     IsAdmin,
@@ -478,26 +440,30 @@ def direct(msg):
         
         wait = bot.send_message(msg.chat.id, 'Please wait...')
         bot.send_chat_action(msg.chat.id, 'upload_video')
-        cap = f'{telebot.formatting.escape_html(data["desc"])}\n\n👤{usrcap}\n\n@YourBotNameHere'
+        cap = f'{telebot.formatting.escape_html(data["desc"])}\n\n👤{usrcap}\n\n@HumbanBot'
         vid = bot.send_video(msg.chat.id, video_data, None, 576, 1048, thumb_data,
                              cap, 'html', reply_to_message_id=msg.message_id)
         bot.delete_message(msg.chat.id, wait.message_id)
 
         try:
-            if True: # Normally bot would check if the user is admin here --> if IsAdmin.check(msg):
+            if IsAdmin.check(msg):
                 proc_keys(msg.chat.id, vidid, vid.message_id)
-            else: # if not then clean the downloaded media from that link after sending it to user.
+            else:
                 clean_folder(vidid)
         except telebot.apihelper.ApiTelegramException as e:
             print(e)
         
     else:
         try:
-            caption = f'{data["desc"]}\n\n👤 {usrcap}\n\n@YourBotNameHere'
+            caption = f'{data["desc"]}\n\n👤 {usrcap}\n\n@HumbanBot'
             imgs = data['image_data']['no_watermark_image_list']
             photos = [types.InputMediaPhoto(img) for img in imgs[1:]]
             first = imgs[0]
             photos.insert(0, types.InputMediaPhoto(first, caption, parse_mode='html'))
-            bot.send_media_group(msg.chat.id, photos)
+            if len(photos) < 11:
+                return bot.send_media_group(msg.chat.id, photos)
+            for _ in range((len(photos) // 10) + 1):
+                bot.send_media_group(msg.chat.id, photos[:10])
+                photos = photos[10:]
         except Exception as exception: # Fix me: broad-except
             bot.reply_to(msg, f'ERROR: {exception}')
