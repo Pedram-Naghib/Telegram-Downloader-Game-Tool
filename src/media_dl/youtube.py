@@ -90,7 +90,12 @@ def utubelink(call: Message):
     author = vidata['author']
 
     if res == 'audio':
-        audio, name = utube.streams.get_audio_only(), title
+        audio = utube.streams.get_audio_only()
+        chars = ['.', '/', '\\', ':', '*', '?', '<', '>']
+
+        for char in chars:
+            title = title.replace(char, ' ')
+        name = title
         try:
             audio.download(output_path='media/', filename=f'{title}.mp3')
         except Exception as e: #! which except?
