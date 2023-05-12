@@ -51,7 +51,7 @@ def youtube_handler(msg: Message):
 
     for i in no_audio:
         res, format_id = i.split(' ')[0], i.split(' ')[2]
-        aud = audio_extract([url], info['title'])
+        aud = audio_extract([url], title_changer(info['title']))
         vidsize = humanize.naturalsize(int(i.split(' ')[1]) + aud)
         if int(i.split(' ')[1]) + aud < 50000000:
             avail_reses[f'{res} ({vidsize})'] = f'{res} {vid_id} {thumb_ql} {format_id} {False}'
@@ -94,7 +94,7 @@ def utubelink(call: Message):
 
     if res == 'audio':
         if not os.path.exists(f'media/{title}.m4a'):
-            audio_size = audio_extract([url], info['title'])
+            audio_size = audio_extract([url], title_changer(info['title']))
         else:
             audio_size = os.path.getsize(f'media/{title}.m4a')
         name = title_changer(title)
@@ -121,7 +121,6 @@ def utubelink(call: Message):
     subprocess.run(['yt-dlp', '-f', format_id, '-o', f'media/{msgid}.mp4', url], stdout=subprocess.PIPE)
     f_name = msgid
     if acodec == 'False':
-        print('hey?')
         audio_extract([url], msgid)
         subprocess.run(['ffmpeg', '-i', f'media/{msgid}.mp4', '-i', f'media/{msgid}.m4a', '-c:v',
                     'copy', '-c:a', 'aac', f'media/{vid_id}.mp4'], stdout=subprocess.PIPE)
@@ -152,7 +151,6 @@ def utubelink(call: Message):
 
 
 def audio_extract(URL: list, title):
-    title = title_changer(title)
     ydl_opts = {
         'format': 'm4a/bestaudio/best',
         'outtmpl': f'media/{title}',
