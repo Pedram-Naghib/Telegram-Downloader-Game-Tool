@@ -70,11 +70,11 @@ def name_audio(call):
         # Retrieve audio duration and thumbnail from database
         duration = mongo.reader(userid, "duration")
         tuid = mongo.reader(userid, "tuid")
-        with open(f"media/{name}.mp3", "rb") as aud:
+        with open(f"media/{name}.m4a", "rb") as aud:
             bot.send_audio(call.message.chat.id, aud, cap, duration, author, title,
                 thumb=types.InputFile(f'media/{tuid}.jpg'))
         # Clean up files
-        return constants.clean_folder([title, tuid])
+        return constants.clean_folder([title, tuid, name])
     
     constants.perf_title(chatid, userid, None, media_tools.change_audio)
 
@@ -110,7 +110,7 @@ def voice(msg):
     except AttributeError:
         pass
 
-    file_dl(title, msg.audio.file_id, 'mp3')
+    file_dl(title, msg.audio.file_id, 'm4a')
 
     mongo.DB.users.update_many({"id": msg.chat.id},
         {"$set": {"duration": duration, "Utitle": title, "tuid": thumb_uid,}}
