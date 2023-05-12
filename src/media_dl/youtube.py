@@ -91,14 +91,13 @@ def utubelink(call: Message):
     urllib.request.urlretrieve(thumbnail_url, filename=f'media/{vid_id}.jpg')
     thumb = f'media/{vid_id}.jpg'
     author = info['uploader']
-
+    name = title_changer(title)
     if res == 'audio':
         if not os.path.exists(f'media/{title}.m4a'):
             audio_size = audio_extract([url], title_changer(info['title']))
         else:
             audio_size = os.path.getsize(f'media/{title}.m4a')
-        name = title_changer(title)
-           
+
         mongo.DB.users.update_many({'id': chatid}, {'$set':
             {'tuid': vid_id, 'duration': info['duration'], 'Utitle': title, 'author': author,
              'filename': name}}, upsert=True)
@@ -121,9 +120,9 @@ def utubelink(call: Message):
     subprocess.run(['yt-dlp', '-f', format_id, '-o', f'media/{msgid}.mp4', url], stdout=subprocess.PIPE)
     f_name = msgid
     if acodec == 'False':
-        if not os.path.exists(f'media/{title}.m4a'):
-            audio_extract([url], title)
-        subprocess.run(['ffmpeg', '-i', f'media/{msgid}.mp4', '-i', f'media/{title}.m4a', '-c:v',
+        if not os.path.exists(f'media/{name}.m4a'):
+            audio_extract([url], name)
+        subprocess.run(['ffmpeg', '-i', f'media/{msgid}.mp4', '-i', f'media/{name}.m4a', '-c:v',
                     'copy', '-c:a', 'aac', f'media/{vid_id}.mp4'], stdout=subprocess.PIPE)
         f_name = vid_id
     
@@ -145,7 +144,7 @@ def utubelink(call: Message):
                     f'utube exception {e}\n{f"https://www.youtube.com/watch?v={vid_id}"}')
         
     bot.delete_state(vid_id, call.from_user.id)
-    constants.clean_folder([msgid, vid_id])
+    constants.clean_folder([msgid, vid_id, name])
     bot.delete_message(chatid, chooseid)
     mongo.DB.users.update_one({'id': call.from_user.id}, {'$unset': {f'choose.{msgid}': 0}})
     return
