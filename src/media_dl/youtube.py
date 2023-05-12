@@ -122,7 +122,7 @@ def utubelink(call: Message):
     f_name = msgid
     if acodec == 'False':
         print('hey?')
-        audio_extract([url], False, msgid)
+        audio_extract([url], msgid)
         subprocess.run(['ffmpeg', '-i', f'media/{msgid}.mp4', '-i', f'media/{msgid}.m4a', '-c:v',
                     'copy', '-c:a', 'aac', f'media/{vid_id}.mp4'], stdout=subprocess.PIPE)
         f_name = vid_id
