@@ -121,8 +121,9 @@ def utubelink(call: Message):
     subprocess.run(['yt-dlp', '-f', format_id, '-o', f'media/{msgid}.mp4', url], stdout=subprocess.PIPE)
     f_name = msgid
     if acodec == 'False':
-        audio_extract([url], msgid)
-        subprocess.run(['ffmpeg', '-i', f'media/{msgid}.mp4', '-i', f'media/{msgid}.m4a', '-c:v',
+        if not os.path.exists(f'media/{title}.m4a'):
+            audio_extract([url], title)
+        subprocess.run(['ffmpeg', '-i', f'media/{msgid}.mp4', '-i', f'media/{title}.m4a', '-c:v',
                     'copy', '-c:a', 'aac', f'media/{vid_id}.mp4'], stdout=subprocess.PIPE)
         f_name = vid_id
     
