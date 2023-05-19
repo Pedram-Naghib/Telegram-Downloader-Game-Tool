@@ -36,7 +36,7 @@ def youtube_handler(msg: Message):
     w_audio = set()
     no_audio = set()
     for i in info.get('formats', None):
-        if i.get('filesize', None) and i['video_ext']  == 'mp4' and i['format_note'] in RESES and 'av01.0' in i['vcodec']:
+        if i.get('filesize', None) and i['video_ext']  == 'mp4' and i['format_note'] in RESES:
             # print(f'{i} \n\n')
             if i['acodec'] != 'none':
                 w_audio.add(f"{i['format_note']} {i['filesize']} {i['format_id']}")
