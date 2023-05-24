@@ -90,7 +90,10 @@ def video_handler(msg):
         vid_proc(msgdata, file_uid)
     else:
     # mp4 to mp3
-        file_exists(None, msg.video.file_id, file_uid)
+        try:
+            file_exists(None, msg.video.file_id, file_uid)
+        except apihelper.ApiException:
+            bot.send_message(msg.chat.id, "File is too big! Maximum file size for mp4 to mp3 conversion is 20MB.")
         mongo.DB.users.update_one({"id": msg.from_user.id}, {"$set": {"file_unique_id": file_uid}})
         constants.perf_title(msg.chat.id, msg.from_user.id, None, media_tools.vid2mp3)
 
