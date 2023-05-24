@@ -15,7 +15,7 @@ import re
 from src import bot
 
 
-SUPER_USER = 0 # insert your telegram ID (You can find out yours by using /myid command in bot)
+SUPER_USER = 0 #ToDo: insert your telegram ID (You can find out yours by using /myid command in bot)
 
 def keyboard(keys, row_width=3, resize_keyboard=True):
     markup = ReplyKeyboardMarkup(row_width=row_width, resize_keyboard=resize_keyboard)
@@ -138,6 +138,7 @@ from telebot.handler_backends import State, StatesGroup
 class MyStates(StatesGroup):
     vid2mp3 = State()
     change_audio = State()
+    res = State()
 
 
 bot.add_custom_filter(custom_filters.StateFilter(bot))
