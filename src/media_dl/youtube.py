@@ -36,8 +36,9 @@ def utubelink(msg: Message):
     for f in files:
         if title in f:
             extension = f.split('.')[-1]
-        else:
-            return bot.send_message(ME, f'{title}\n{f}')
+            break
+    else:
+        return bot.send_message(ME, f'{title}\n{f}')
 
     url1 = f'http://img.youtube.com/vi/{vid_id}/maxresdefault.jpg'
     url2 = f'http://img.youtube.com/vi/{vid_id}/0.jpg'
