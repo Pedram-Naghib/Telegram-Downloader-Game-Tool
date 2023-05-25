@@ -74,7 +74,7 @@ You can change your default resolution with {formatting.hcode('/resolution')} in
 
 
 def title_changer(title):
-    chars = {'.': '．', '/': '⧸', '\\': '＼＼', ':': '：', '*': '＊', '?': '？', '<': '＜', '>': '＞', '|': '｜'}
+    chars = {'/': '⧸', '\\': '＼＼', ':': '：', '*': '＊', '?': '？', '<': '＜', '>': '＞', '|': '｜'} # '.': '．', 
 
     for k, v in chars.items():
         title = title.replace(k, v)
