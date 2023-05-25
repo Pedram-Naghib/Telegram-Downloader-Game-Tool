@@ -49,6 +49,12 @@ def webhook():
     return "!", 200
 
 
+@server.after_request
+def add_vary_header(response):
+    response.headers['Vary'] = 'Cookie'
+    return response
+
+
 from src.media_dl import reddit, tiktok, youtube
 from src import constants, mongo, media_tools, responses
 from src.games import economy, black_jack, roulette
