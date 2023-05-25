@@ -7,7 +7,7 @@ python-dotenv==0.20.0
 python-utils==3.2.2
 schedule==1.1.0
 urllib3==1.26.5
-requests==2.25.1
+requests==2.31.0
 dnspython==2.2.1
 yt-dlp==2023.3.4
 Flask==2.1.2
