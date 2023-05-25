@@ -10,7 +10,7 @@ urllib3==1.26.5
 requests==2.31.0
 dnspython==2.2.1
 yt-dlp==2023.3.4
-Flask==2.1.2
+Flask==2.2.5
 tenacity==6.3.1
 aiohttp==3.8.3
 humanize==4.4.0
