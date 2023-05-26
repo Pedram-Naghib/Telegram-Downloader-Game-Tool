@@ -22,10 +22,13 @@ def audio_extract(msg: Message):
     if len(msg.text.split(' ')) > 1:
         URL = re.findall(r'https?://.*youtu\S+', msg.text)
     else:
-        if txt := msg.reply_to_message.text:
-            URL = re.findall(r'https?://.*youtu\S+', txt)
+        try:
+            if txt := msg.reply_to_message.text:
+                URL = re.findall(r'https?://.*youtu\S+', txt)
+        except:
+            return bot.send_message(msg.chat.id, f"Wrong command arguments. Correct example: {formatting.hcode('/a <youtube link>')} - or reply the command to a youtube link.")
     if not URL:
-        return bot.send_message(msg.chat.id, f"Wrong command arguments. Correct example: formatting.hcode{'/a <youtube link>'}")
+        return bot.send_message(msg.chat.id, f"Wrong command arguments. Correct example: {formatting.hcode('/a <youtube link>')} - or reply the command to a youtube link.")
     ydl_opts = {
         'format': 'm4a/bestaudio/best',
         'outtmpl': f'media/%(title)s.%(ext)s',
@@ -41,7 +44,7 @@ def audio_extract(msg: Message):
         info = ydl.extract_info(URL[0], download=True)
         title, author, vidid = info['title'], info['uploader'], info['id']
         thumb_dl(vidid)
-        with open(f"media/{title}.mp3", "rb") as aud:
+        with open(f"media/{title_changer((title))}.mp3", "rb") as aud:
             bot.send_audio(msg.chat.id, aud, '@HumbanBot', info['duration'], author, title,
                 thumb=InputFile(f"media/{vidid}.jpg"))
         # Clean media directory from processed files.
@@ -58,7 +61,6 @@ def utubelink(msg: Message):
 
     try:
         info = url_info(url, RESES.index(res))
-        print(info)
     except LookupError as e:
         return bot.send_message(chatid, e)
     
