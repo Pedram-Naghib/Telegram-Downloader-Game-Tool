@@ -38,10 +38,13 @@ def audio_extract(msg: Message): # r'https?://.*youtu\S+'  URL: list, title
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         # ydl.download([URL])
         info = ydl.extract_info(URL[0], download=True)
-        thumb_dl(info['id'])
-        mongo.DB.users.update_one({"id": msg.from_user.id}, {"$set": {"Utitle": title_changer(info['title']),
-                                                                      "tuid": info['id']}}, upsert=True)
-        constants.perf_title(msg.chat.id, msg.from_user.id, None, media_tools.change_audio)
+        title, author, vidid = info['title'], info['uploader'], info['id']
+        thumb_dl(vidid)
+        with open(f"media/{title}.mp3", "rb") as aud:
+            bot.send_audio(msg.chat.id, aud, '@HumbanBot', info['duration'], author, title,
+                thumb=InputFile(f"media/{vidid}.jpg"))
+        # Clean media directory from processed files.
+        constants.clean_folder([title, vidid])
 
 
 @ bot.message_handler(regexp=r'https?://.*youtu\S+')
