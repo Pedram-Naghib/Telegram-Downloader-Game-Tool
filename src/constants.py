@@ -121,7 +121,9 @@ def caption(user, hash):
 def echo(msg):
     name = msg.chat.first_name
     text = f"Hey <strong>{name}</strong>!\nDownload media (up to 50Mb) from Youtube, Tiktok, Reddit by sending me their links.\
-\nUse /help command to findout more about bot game features!"
+\nUse /help command to findout more about bot game features!\n\
+/a <youtube link> - to download the youtube video as audio.\n\
+/resolution - to specify the desired resolution for downloading YouTube videos (default is 720)."
     if IsAdmin.check(msg) and msg.chat.type == "private":
         text += "\n/cut S.xxx - Cut S seconds and xxx miliseconds from end of the video.\
 \n/watermark - Wtermark the video which the command was replied to.\
