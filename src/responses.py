@@ -27,7 +27,7 @@ def videcide(call: types.CallbackQuery):
         constants.clean_folder(fileid)
         
     elif tag == 'Audio':
-        constants.perf_title(chatid, userid, None, media_tools.vid2mp3, chatid, fileid)
+        constants.perf_title(chatid, userid, None, media_tools.vid2mp3)
         bot.edit_message_reply_markup(chatid, msgid, reply_markup=None)
         return
         
@@ -45,38 +45,6 @@ def join_check(call: types.CallbackQuery):
         return
     bot.answer_callback_query(call.id, 
         "You are not joined yet. Please first join and then press Done.",True)
-    
-    
-@bot.callback_query_handler(func=None, validator='chudio', is_sender=True)
-def name_audio(call):
-    """
-    Handle callback queries when the callback data starts with "chudio" or "chudioc" and ends with the user's ID
-    :param call: callback query object
-    """
-    chatid = call.message.chat.id
-    # Retrieve user's ID and message ID from callback data
-    userid = call.from_user.id
-    msgid = call.data.split("-")[1]
-    # Edit the reply markup of a previous message
-    bot.edit_message_reply_markup(
-        chatid, mongo.reader(userid, "change")[str(msgid)], reply_markup=None
-    )
-    # Retrieve audio title and author from database
-    title, name = mongo.reader(userid, "Utitle"), mongo.reader(userid, "filename")
-    author = mongo.reader(userid, "author")
-    cap = '@YourBotNameHere'
-
-    if call.data.split("-")[0] == "chudio c":
-        # Retrieve audio duration and thumbnail from database
-        duration = mongo.reader(userid, "duration")
-        tuid = mongo.reader(userid, "tuid")
-        with open(f"media/{name}.m4a", "rb") as aud:
-            bot.send_audio(call.message.chat.id, aud, cap, duration, author, title,
-                thumb=types.InputFile(f'media/{tuid}.jpg'))
-        # Clean up files
-        return constants.clean_folder([title, tuid, name])
-    
-    constants.perf_title(chatid, userid, None, media_tools.change_audio)
 
     
 #* -------------------------------------------------------------------------------------------------    
@@ -113,7 +81,7 @@ def voice(msg):
     except AttributeError:
         pass
 
-    file_dl(title, msg.audio.file_id, 'm4a')
+    file_dl(title, msg.audio.file_id, 'mp3')
 
     mongo.DB.users.update_many({"id": msg.chat.id},
         {"$set": {"duration": duration, "Utitle": title, "tuid": thumb_uid,}}
