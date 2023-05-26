@@ -16,8 +16,9 @@ ME = -847590350
 
 
 @bot.message_handler(commands=['a'])
-def audio_extract(msg: Message): # r'https?://.*youtu\S+'  URL: list, title
-    URL = [] #/a https://youtu.be/dUd9-92EEuw kjabckbah
+def audio_extract(msg: Message):
+    bot.send_chat_action(msg.chat.id, 'upload_document')
+    URL = []
     if len(msg.text.split(' ')) > 1:
         URL = re.findall(r'https?://.*youtu\S+', msg.text)
     else:
@@ -60,6 +61,8 @@ def utubelink(msg: Message):
         print(info)
     except LookupError as e:
         return bot.send_message(chatid, e)
+    
+    bot.send_chat_action(chatid, 'upload_video')
 
     title, vid_id = info['title'], info['id']
     thumb = f'media/{vid_id}.jpg'
