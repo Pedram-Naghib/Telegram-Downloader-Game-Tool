@@ -125,8 +125,7 @@ def vidproc(call):
     
 @bot.message_handler(state=constants.MyStates.change_audio)
 def change_audio(msg):
-    print('change audio triggered...!')
-    userid = msg.from_user.id  # ?msgid = msg.chat.id remove?
+    userid = msg.from_user.id
     orgtitle = mongo.reader(userid, "Utitle")
     data = msg.text.split("\n")
     tuid, duration = mongo.reader(userid, "tuid"), mongo.reader(userid, "duration")
