@@ -1,6 +1,6 @@
 from telebot import apihelper, formatting
 from telebot.types import InputFile, Message
-from src import constants, mongo, bot
+from src import constants, mongo, bot, media_tools
 import urllib.request
 import yt_dlp
 import requests
@@ -8,13 +8,43 @@ import humanize
 from PIL import Image
 import glob
 import os
+import re
 
 
 RESES = '144', '240', '360', '480', '720', '1080', '1440', '2160'
 ME = -847590350
 
 
-@ bot.message_handler(regexp=r'https?://.*youtu.+')
+@bot.message_handler(commands=['a'])
+def audio_extract(msg: Message): # r'https?://.*youtu\S+'  URL: list, title
+    URL = [] #/a https://youtu.be/dUd9-92EEuw kjabckbah
+    if len(msg.text.split(' ')) > 1:
+        URL = re.findall(r'https?://.*youtu\S+', msg.text)
+    else:
+        if txt := msg.reply_to_message.text:
+            URL = re.findall(r'https?://.*youtu\S+', txt)
+    if not URL:
+        return bot.send_message(msg.chat.id, f"Wrong command arguments. Correct example: formatting.hcode{'/a <youtube link>'}")
+    ydl_opts = {
+        'format': 'm4a/bestaudio/best',
+        'outtmpl': f'media/%(title)s.%(ext)s',
+        # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
+        'postprocessors': [{  # Extract audio using ffmpeg
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3', # m4a
+        }]
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        # ydl.download([URL])
+        info = ydl.extract_info(URL[0], download=True)
+        thumb_dl(info['id'])
+        mongo.DB.users.update_one({"id": msg.from_user.id}, {"$set": {"Utitle": title_changer(info['title']),
+                                                                      "tuid": info['id']}}, upsert=True)
+        constants.perf_title(msg.chat.id, msg.from_user.id, None, media_tools.change_audio)
+
+
+@ bot.message_handler(regexp=r'https?://.*youtu\S+')
 def utubelink(msg: Message):
     msgid, chatid, url = msg.message_id, msg.chat.id, msg.text
     try:
@@ -24,6 +54,7 @@ def utubelink(msg: Message):
 
     try:
         info = url_info(url, RESES.index(res))
+        print(info)
     except LookupError as e:
         return bot.send_message(chatid, e)
 
@@ -40,26 +71,20 @@ def utubelink(msg: Message):
     else:
         return bot.send_message(ME, f'{title}\n{f}')
 
-    url1 = f'http://img.youtube.com/vi/{vid_id}/maxresdefault.jpg'
-    url2 = f'http://img.youtube.com/vi/{vid_id}/0.jpg'
-    thumbnail_url = url1 if requests.get(url1).status_code == 200 else url2
-    urllib.request.urlretrieve(thumbnail_url, filename=f'media/{vid_id}.jpg')
+    thumb_dl(vid_id)
     
     with open(f'media/{title}.{extension}', 'rb') as video:
         views, duration = humanize.intword(info["view_count"]), info['duration']
         caption = f'{title}\n\n👤 {author}\n👁️ {views}'
         with Image.open(thumb) as img:
-            image_size = os.path.getsize(thumb)
-            while image_size > 200 * 1024:
-                image_size = thumb_resize(thumb)
             try:
                 bot.send_chat_action(chatid, 'upload_video')
-                vid_msg = bot.send_video(chatid, video, duration, img.width, img.height,
+                bot.send_video(chatid, video, duration, img.width, img.height,
                     InputFile(thumb), caption, reply_to_message_id=msgid,
                     supports_streaming=True, timeout=500)
             except apihelper.ApiTelegramException:
                 bot.send_chat_action(chatid, 'upload_video')
-                vid_msg = bot.send_video(chatid, video, duration, img.width, img.height,
+                bot.send_video(chatid, video, duration, img.width, img.height,
                     InputFile(thumb), caption, supports_streaming=True, timeout=500)
             except Exception as e:
                 bot.send_message(ME, 
@@ -120,3 +145,14 @@ def res_change(msg: Message):
 def res_chosed(msg):
     mongo.DB.users.update_one({"id": msg.from_user.id}, {"$set": {"resolution": msg.text}}, upsert=True)
     bot.send_message(msg.chat.id, f"Your default resolution for downloading YouTube videos succesfully changed to {msg.text}!")
+    bot.delete_state(msg.from_user.id, msg.chat.id)
+
+
+def thumb_dl(vid_id):
+    url1 = f'http://img.youtube.com/vi/{vid_id}/maxresdefault.jpg'
+    url2 = f'http://img.youtube.com/vi/{vid_id}/0.jpg'
+    thumbnail_url = url1 if requests.get(url1).status_code == 200 else url2
+    urllib.request.urlretrieve(thumbnail_url, filename=f'media/{vid_id}.jpg')
+    image_size = os.path.getsize(f'media/{vid_id}.jpg')
+    while image_size > 200 * 1024:
+        image_size = thumb_resize(f'media/{vid_id}.jpg')
