@@ -122,7 +122,7 @@ def echo(msg):
     name = msg.chat.first_name
     text = f"Hey <strong>{name}</strong>!\nDownload media (up to 50Mb) from Youtube, Tiktok, Reddit by sending me their links.\
 \nUse /help command to findout more about bot game features!\n\
-/a <youtube link> - to download the youtube video as audio.\n\
+/a <youtube link> - to download the youtube video as audio (alternativly you can also reply this command to a youtube link).\n\
 /resolution - to specify the desired resolution for downloading YouTube videos (default is 720)."
     if IsAdmin.check(msg) and msg.chat.type == "private":
         text += "\n/cut S.xxx - Cut S seconds and xxx miliseconds from end of the video.\
@@ -145,15 +145,14 @@ class MyStates(StatesGroup):
 
 bot.add_custom_filter(custom_filters.StateFilter(bot))
 
-def perf_title(chatid, userid, info, func, *args):
+def perf_title(chatid, userid, info, func):
+    text = "Please send the audio's name and artist in one message and 2 lines\n\naudio name\naudio artist"
     if info:
         title, author = info
         # Send the current title and artist of the audio
-        bot.send_message(chatid,
-                         f"👇Current information:\n\n{hbold('Title')}: {hcode(title)}\n{hbold('Artist')}: {hcode(author)}")
+        text += f"\n\n👇Current information:\n\n{hbold('Title')}: {hcode(title)}\n{hbold('Artist')}: {hcode(author)}"
     # Send a message asking user to send audio name and artist
-    bot.send_message(chatid, "Please send the audio's \
-name and artist in one message and 2 lines\n\naudio name\naudio artist", reply_markup=keyboards.cancel)
+    bot.send_message(chatid, text, reply_markup=keyboard.cancel)
     # Register next step handler to change the audio
     if func.__name__ == 'vid2mp3':
         return bot.set_state(userid, MyStates.vid2mp3, chatid)
