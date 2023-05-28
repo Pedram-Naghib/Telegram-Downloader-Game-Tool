@@ -98,6 +98,7 @@ def utubelink(msg: Message):
                 bot.send_message(ME, 
                     f'utube exception {e}\n{f"https://www.youtube.com/watch?v={vid_id}"}')
     if info['reduct']:
+        resb = formatting.hbold(str(info['height']))
         bot.send_message(chatid, f"Rquested: {formatting.hbold(res)}p Downloaded: {(resb)}p.\nReason 50MB filesize limit.")
         
     bot.delete_state(vid_id, msg.from_user.id)
