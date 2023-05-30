@@ -39,9 +39,10 @@ def finder(id, file_id, key='sfw'):
         update_ids(id, file_id, key)
 
 
-def reader(id, item):
-    things = DB.users.find({'id': id})
-    return list(things)[0][item]
+def reader(id, item, default=None):
+    document = DB.users.find({'id': id})
+    document: dict = list(document)[0]
+    return document.get(item, default)
 
 
 def ecReader(chatid, userid=None, *, key=None):

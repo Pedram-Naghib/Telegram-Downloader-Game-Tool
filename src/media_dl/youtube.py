@@ -71,36 +71,23 @@ def utubelink(msg: Message):
     author = info['uploader']
     
     title = title_changer(title)
-    files = glob.glob("./media/*")
-    for f in files:
-        if title in f:
-            extension = f.split('.')[-1]
-            break
-    else:
-        return bot.send_message(ME, f'{title}\n{f}')
-
+    print('changed title')
     thumb_dl(vid_id)
-    
-    with open(f'media/{title}.{extension}', 'rb') as video:
+    print('opening...')
+    with open(f'media/{title}.mp4', 'rb') as video:
+        print('opened!')
         views, duration = humanize.intword(info["view_count"]), info['duration']
         caption = f'{title}\n\n👤 {author}\n👁️ {views}'
         with Image.open(thumb) as img:
             try:
-                bot.send_chat_action(chatid, 'upload_video')
-                bot.send_video(chatid, video, duration, img.width, img.height,
-                    InputFile(thumb), caption, reply_to_message_id=msgid,
-                    supports_streaming=True, timeout=500)
-            except apihelper.ApiTelegramException:
+                print('sending...')
                 bot.send_chat_action(chatid, 'upload_video')
                 bot.send_video(chatid, video, duration, img.width, img.height,
                     InputFile(thumb), caption, supports_streaming=True, timeout=500)
             except Exception as e:
                 bot.send_message(ME, 
                     f'utube exception {e}\n{f"https://www.youtube.com/watch?v={vid_id}"}')
-    if info['reduct']:
-        resb = formatting.hbold(str(info['height']) + 'p')
-        bot.send_message(chatid, f"Rquested: {formatting.hbold(res + 'p')} Downloaded: {(resb)}.\nReason: 50MB filesize limit.")
-        
+
     bot.delete_state(vid_id, msg.from_user.id)
     constants.clean_folder([msgid, vid_id, title])
     return
@@ -116,34 +103,31 @@ def title_changer(title):
 
 def thumb_resize(path):
     image = Image.open(path)
-    image.save(path, optimize=True, quality=80)
+    image.save(path, optimize=True, quality=70)
     return os.path.getsize(path)
 
 
-def url_info(url, res, reduct=False):
-    ydl_opts = {'ext': 'mp4',
-                'format': f'bestvideo[height<={RESES[res]}]+bestaudio/best[height<={RESES[res]}]',
-                'outtmpl': 'media/%(title)s.%(ext)s'}
+def url_info(url, res):
+    ydl_opts = {
+        'format': f'bestvideo[ext=mp4][height<={RESES[res]}]+bestaudio[ext=m4a]/best[ext=mp4][height<={RESES[res]}]',
+        'outtmpl': 'media/%(title)s.%(ext)s'
+    }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
         while info['filesize_approx'] > 52000000:
             if res == 0:
                 raise apihelper.ApiException("No compatible format found within the file size limit of 50MB.")
-            return url_info(url, res - 1, True)
+            return url_info(url, res - 1)
         if info['availability'] != 'public':
             condition = info['availability'] if info['availability'] == 'needs_auth' else f'is {info["availability"]}'
             raise LookupError(f"This video {condition.replace('_', ' ')}")
         ydl.download([url])
-        info['reduct'] = reduct
         return info
 
 
 @bot.message_handler(commands=['resolution'], chat_types=["private"])
 def res_change(msg: Message):
-    try:
-        res = mongo.reader(msg.from_user.id, "resolution")
-    except KeyError:
-        res = '720'
+    res = mongo.reader(msg.from_user.id, "resolution", "720")
     bot.send_message(msg.chat.id, f'Please select a preset resolution for downloading YouTube videos.\nCurrent resolution: {res}',
                      reply_markup=constants.keyboard([i for i in RESES], 4))
     bot.set_state(msg.from_user.id, constants.MyStates.res, msg.chat.id)
@@ -152,7 +136,8 @@ def res_change(msg: Message):
 @bot.message_handler(state=constants.MyStates.res)
 def res_chosed(msg):
     mongo.DB.users.update_one({"id": msg.from_user.id}, {"$set": {"resolution": msg.text}}, upsert=True)
-    bot.send_message(msg.chat.id, f"Your default resolution for downloading YouTube videos succesfully changed to {msg.text}!")
+    bot.send_message(msg.chat.id, f"Your default resolution for downloading YouTube videos succesfully changed to {msg.text}!",
+                     reply_markup=None)
     bot.delete_state(msg.from_user.id, msg.chat.id)
 
 
