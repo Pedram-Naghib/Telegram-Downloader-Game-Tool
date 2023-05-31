@@ -257,32 +257,37 @@ def dir_tree(msg):
             
             
 @bot.message_handler(commands=["cut"]) # , bot_admin=True
-def trim(msg):
-    video = msg.reply_to_message.video
-    chatid = msg.chat.id
-    if not (msg.reply_to_message and msg.reply_to_message.video):
-        bot.send_message(chatid, "Please reply to a video")
-
-    mongo.DB.users.update_many({"id": chatid},{"$set":
-        {"duration": video.duration, "file_unique_id": video.file_unique_id}},upsert=True,)
-
-    f_uid = mongo.reader(msg.from_user.id, "file_unique_id")
-    file_info = bot.get_file(msg.reply_to_message.video.file_id)
-
-    mongo.DB.users.update_one({"id": msg.from_user.id}, {"$set":
-        {"temp_file": bot.download_file(file_info.file_path)}}, upsert=True)
-
-    with open(f"media/{msg.from_user.id}_{f_uid}.mp4", "wb") as video:
-        video.write(mongo.reader(msg.from_user.id, "temp_file"))
-
-    mongo.DB.users.update_one(
-        {"id": msg.from_user.id}, {"$set": {"temp_file": None}})
+def trim(msg: types.Message):
+    try:
+        video = msg.reply_to_message.video
+        print(video)
+        chatid = msg.chat.id
+        args = msg.text.split(' ')
+        float(args[1])
+    except:
+        return bot.reply_to(msg,
+                     'Correct usage: /cut S.xxx where S is seconds and x are miliseconds to cut from end of the video.')    
+    print(f'len args: {len(args)}\n\ndur: {video.duration}\n\nargs[1]: {args[1]}')
+    if len(args) != 2 or float(args[1]) > video.duration:
+        return bot.reply_to(msg,
+                     'Correct usage: /cut S.xxx where S is seconds and x are miliseconds to cut from end of the video.')
     
-    ask = bot.send_message(
-        msg.chat.id,
-        "Please type secounds you want to cut from end\
-of the video in S.xxx-S.xxx format(where x is millisecond and S is secounds)")
-    bot.register_next_step_handler(ask, do_trim)
+    if not (msg.reply_to_message and video):
+        bot.send_message(chatid, "Please reply to a video.")
+        return
+
+    f_uid = video.file_unique_id
+    file_info = bot.get_file(video.file_id)
+    temp_file = bot.download_file(file_info.file_path)
+
+    with open(f"media/input_{f_uid}.mp4", "wb") as vid:
+        vid.write(temp_file)
+    
+    media_tools.vid_cut(f_uid, args[1], video.duration)
+    
+    with open(f'media/{f_uid}.mp4', "rb") as video:
+        bot.send_video(msg.chat.id, video, caption=msg.reply_to_message.caption)
+    constants.clean_folder(f_uid)
 
 
 @ bot.message_handler(commands=['watermark'])#, bot_admin=True
