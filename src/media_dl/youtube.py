@@ -54,10 +54,7 @@ def audio_extract(msg: Message):
 @ bot.message_handler(regexp=r'https?://.*youtu\S+')
 def utubelink(msg: Message):
     msgid, chatid, url = msg.message_id, msg.chat.id, msg.text
-    try:
-        res = mongo.reader(msg.from_user.id, "resolution")
-    except KeyError:
-        res = '720'
+    res = mongo.reader(msg.from_user.id, "resolution", '720')
 
     try:
         info = url_info(url, RESES.index(res))
