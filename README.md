@@ -1,9 +1,9 @@
 # UltraTTBot :rocket::robot:
 
 
-## • Demonstration video:
+## • Video Demo::
 
-https://youtu.be/p77BfNEfyyg
+https://youtu.be/VCYIc41ThXU
 
 
 This bot's abilities can be divided into 3 parts:
