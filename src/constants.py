@@ -152,7 +152,7 @@ def perf_title(chatid, userid, info, func):
         # Send the current title and artist of the audio
         text += f"\n\n👇Current information:\n\n{hbold('Title')}: {hcode(title)}\n{hbold('Artist')}: {hcode(author)}"
     # Send a message asking user to send audio name and artist
-    bot.send_message(chatid, text, reply_markup=keyboard.cancel)
+    bot.send_message(chatid, text, reply_markup=keyboards.cancel)
     # Register next step handler to change the audio
     if func.__name__ == 'vid2mp3':
         return bot.set_state(userid, MyStates.vid2mp3, chatid)

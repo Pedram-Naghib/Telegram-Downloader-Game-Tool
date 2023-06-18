@@ -217,24 +217,7 @@ def post_from_link(file_uid, user_id):
     else:
         bot.send_message(
             user_id, "The video you are looking for could not be found!")
-        
-        
-def do_trim(msg):
-    userid = msg.from_user.id
-    # start = msg.text.split('-')[0].strip()
-    try:
-        float(msg.text)
-        if float(msg.text) > mongo.reader(userid, "duration") or len(msg.text.split(".")) == 1:
-            bot.send_message(msg.chat.id, "Make sure you entered the number correctly.")
-    except ValueError:
-        bot.send_message(userid, "You should enter numbers!")
 
-    media_tools.vid_cut(userid, mongo.reader(userid, "file_unique_id"),
-        msg.text, mongo.reader(userid, "duration"))
-    
-    with open(f'media/{userid}${mongo.reader(userid, "file_unique_id")}.mp4', "rb") as video:
-        bot.send_video(msg.chat.id, video)
-    constants.clean_folder(msg_id=mongo.reader(userid, "file_unique_id"))
 
 #* -------------------------------------------------------------------------------------------------    
 #* functions related to admins or super user 
@@ -256,7 +239,7 @@ def dir_tree(msg):
             bot.send_message(msg.chat.id, "invalid")
             
             
-@bot.message_handler(commands=["cut"]) # , bot_admin=True
+@bot.message_handler(commands=["cut"]) # bot_admin=True
 def trim(msg: types.Message):
     try:
         video = msg.reply_to_message.video
@@ -277,7 +260,10 @@ def trim(msg: types.Message):
         return
 
     f_uid = video.file_unique_id
-    file_info = bot.get_file(video.file_id)
+    try:
+        file_info = bot.get_file(video.file_id)
+    except:
+        return bot.send_message(chatid, "A request to the Telegram API was unsuccessful. Error code: 400.\nDescription: Bad Request: <strong>file is too big</strong>")
     temp_file = bot.download_file(file_info.file_path)
 
     with open(f"media/input_{f_uid}.mp4", "wb") as vid:

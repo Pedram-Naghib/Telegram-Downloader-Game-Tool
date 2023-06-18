@@ -52,12 +52,19 @@ def vid_edit(msg_id, d, w):
 
 
 
-def vid_cut(msgid, postid, sec, d):
-    t1 = str(int(d) - float(sec)).split('.')
-    t, ms = str(t1[0]).zfill(2), str(t1[1]).zfill(3)
+def vid_cut(postid, sec, d):
+    t1 = str(int(d) - float(sec))
+    s, ms = str(t1).split(".")
+    s = int(s)
+    temp, s = s // 60, s % 60
+    if temp:
+        h, m = temp // 60, temp % 60
+    else:
+        h, m = 0, 0
+    h, m, s, ms = list(map(str, [h, m, s, ms]))
 
-    subprocess.run(['ffmpeg', '-ss', '00:00:00.00', '-to', f'00:00:{t}.{ms}', '-i',
-                    f'media/{msgid}_{postid}.mp4', '-c', 'copy', f'media/{msgid}${postid}.mp4'], stdout=subprocess.PIPE)
+    subprocess.run(['ffmpeg', '-ss', '00:00:00.00', '-to', f'{h}:{m}:{s}.{ms}', '-i',
+                    f'media/input_{postid}.mp4', '-c', 'copy', f'media/{postid}.mp4'], stdout=subprocess.PIPE)
     
 
 @bot.message_handler(state=constants.MyStates.vid2mp3)
