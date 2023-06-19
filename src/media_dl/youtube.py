@@ -1,5 +1,5 @@
 from telebot import apihelper, formatting
-from telebot.types import InputFile, Message
+from telebot.types import InputFile, Message, ReplyKeyboardRemove
 from src import constants, mongo, bot, media_tools
 import urllib.request
 import yt_dlp
@@ -125,16 +125,16 @@ def url_info(url, res):
 @bot.message_handler(commands=['resolution'], chat_types=["private"])
 def res_change(msg: Message):
     res = mongo.reader(msg.from_user.id, "resolution", "720")
+    bot.set_state(msg.from_user.id, constants.MyStates.res, msg.chat.id)
     bot.send_message(msg.chat.id, f'Please select a preset resolution for downloading YouTube videos.\nCurrent resolution: {res}',
                      reply_markup=constants.keyboard([i for i in RESES], 4))
-    bot.set_state(msg.from_user.id, constants.MyStates.res, msg.chat.id)
     
 
 @bot.message_handler(state=constants.MyStates.res)
 def res_chosed(msg):
     mongo.DB.users.update_one({"id": msg.from_user.id}, {"$set": {"resolution": msg.text}}, upsert=True)
     bot.send_message(msg.chat.id, f"Your default resolution for downloading YouTube videos succesfully changed to {msg.text}!",
-                     reply_markup=None)
+                     reply_markup=ReplyKeyboardRemove())
     bot.delete_state(msg.from_user.id, msg.chat.id)
 
 
