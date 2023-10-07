@@ -454,16 +454,18 @@ def direct(msg):
             print(e)
         
     else:
-        try:
-            caption = f'{data["desc"]}\n\n👤 {usrcap}\n\n@HumbanBot'
-            imgs = data['image_data']['no_watermark_image_list']
-            photos = [types.InputMediaPhoto(img) for img in imgs[1:]]
-            first = imgs[0]
-            photos.insert(0, types.InputMediaPhoto(first, caption, parse_mode='html'))
-            if len(photos) < 11:
-                return bot.send_media_group(msg.chat.id, photos)
-            for _ in range((len(photos) // 10) + 1):
-                bot.send_media_group(msg.chat.id, photos[:10])
-                photos = photos[10:]
-        except Exception as exception: # Fix me: broad-except
-            bot.reply_to(msg, f'ERROR: {exception}')
+        caption = f'{data["desc"]}\n\n👤 {usrcap}\n\n@your_bot_id_goes_here'
+        imgs = data['image_data']['no_watermark_image_list']
+        photos = [types.InputMediaPhoto(img) for img in imgs[:-1]]
+        first = imgs[-1]
+        photos.insert(100, types.InputMediaPhoto(first, caption, parse_mode='html'))
+        tt_album(msg, photos)
+
+
+def tt_album(msg, photos):
+    if len(photos) < 11:
+        return bot.send_media_group(msg.chat.id, photos)
+    else:
+        for _ in range((len(photos) // 10) + 1):
+            bot.send_media_group(msg.chat.id, photos[:10])
+            photos = photos[10:]
