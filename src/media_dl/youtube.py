@@ -1,18 +1,16 @@
 from telebot import apihelper, formatting
 from telebot.types import InputFile, Message, ReplyKeyboardRemove
-from src import constants, mongo, bot, media_tools
+from src import constants, mongo, bot
 import urllib.request
 import yt_dlp
 import requests
 import humanize
 from PIL import Image
-import glob
 import os
 import re
 
 
 RESES = '144', '240', '360', '480', '720', '1080', '1440', '2160'
-ME = -847590350
 
 
 @bot.message_handler(commands=['a'])
@@ -52,13 +50,17 @@ def audio_extract(msg: Message):
 
 
 @ bot.message_handler(regexp=r'https?://.*youtu\S+')
-def utubelink(msg: Message):
+def utubelink(msg: Message, def_res=None):
     msgid, chatid, url = msg.message_id, msg.chat.id, msg.text
-    res = mongo.reader(msg.from_user.id, "resolution", '720')
+    resol = mongo.reader(msg.from_user.id, "resolution", '720')
+    res = def_res if def_res else resol
+    res_index = RESES.index(res)
 
     try:
-        info = url_info(url, RESES.index(res))
+        info = url_info(url, res_index)
     except LookupError as e:
+        return bot.send_message(chatid, e)
+    except Exception as e:
         return bot.send_message(chatid, e)
     
     bot.send_chat_action(chatid, 'upload_video')
@@ -82,8 +84,14 @@ def utubelink(msg: Message):
                 bot.send_video(chatid, video, duration, img.width, img.height,
                     InputFile(thumb), caption, supports_streaming=True, timeout=500)
             except Exception as e:
-                bot.send_message(ME, 
-                    f'utube exception {e}\n{f"https://www.youtube.com/watch?v={vid_id}"}')
+                if res == '144':
+                    bot.send_message(chatid, "Your video exceeds the maximum allowed size of 50MB, and no available resolution matches this limit.")
+                else:
+                    bot.send_message(chatid, "Your video exceeds the maximum allowed size of 50MB. To send the video successfully, please reduce the resolution.")
+
+    if def_res:
+        bot.send_message(msg.chat.id, f"Video resolution changed from {resol} to {def_res} because of 50Mb size limit.\
+/nYou can change your default resolution with /resolution in bot's chat.")
 
     bot.delete_state(vid_id, msg.from_user.id)
     constants.clean_folder([msgid, vid_id, title])
@@ -94,7 +102,8 @@ def title_changer(title):
     chars = {'/': '⧸', '\\': '＼＼', ':': '：', '*': '＊', '?': '？', '<': '＜', '>': '＞', '|': '｜'} # '.': '．', 
 
     for k, v in chars.items():
-        title = title.replace(k, v)
+        if k in title:
+            title = title.replace(k, v)
     return title
 
 
@@ -104,17 +113,17 @@ def thumb_resize(path):
     return os.path.getsize(path)
 
 
-def url_info(url, res):
+def url_info(url, res_index):
     ydl_opts = {
-        'format': f'bestvideo[ext=mp4][height<={RESES[res]}]+bestaudio[ext=m4a]/best[ext=mp4][height<={RESES[res]}]',
+        'format': f'bestvideo[ext=mp4][height<={RESES[res_index]}]+bestaudio[ext=m4a]/best[ext=mp4][height<={RESES[res_index]}]',
         'outtmpl': 'media/%(title)s.%(ext)s'
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
         while info['filesize_approx'] > 52000000:
-            if res == 0:
+            if res_index == 0:
                 raise apihelper.ApiException("No compatible format found within the file size limit of 50MB.")
-            return url_info(url, res - 1)
+            return url_info(url, res_index - 1)
         if info['availability'] != 'public':
             condition = info['availability'] if info['availability'] == 'needs_auth' else f'is {info["availability"]}'
             raise LookupError(f"This video {condition.replace('_', ' ')}")
