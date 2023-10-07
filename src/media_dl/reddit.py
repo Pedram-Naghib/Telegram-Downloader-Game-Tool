@@ -3,23 +3,12 @@ from src import reddit_config, bot
 from src.media_tools import vid_dl
 import urllib.request
 import re
-
-
-from random import shuffle
-import time
-import requests
-from src.mongo import update_ids, finder
-from loguru import logger
-from src import constants, reddit_config, bot
-from src.media_tools import vid_dl, ME
-from telebot import types
 import urllib.request
-import re
 
 
-@bot.message_handler(regexp=r"https?://[www.]*reddit\.com/r/.+/comments/.+/.+")
+@bot.message_handler(regexp=r"reddit\.com/r/.+")
 def send_reddit(msg):
-    url = re.findall(r"reddit\.com/r/.+/comments/.+/.+/", msg.text)
+    url = re.findall(r"reddit\.com/r/.+", msg.text)
     url = f"https://oauth.{url[0]}"
     chatid = msg.chat.id
 
@@ -36,9 +25,10 @@ def send_reddit(msg):
     except (urllib.error.HTTPError, ValueError, TypeError):
         dims = None
 
-    if data["is_reddit_media_domain"] and "video" in data["post_hint"]:
+    if data["is_reddit_media_domain"] and ("video" in data.get('post_hint', 'None') or data['is_video']):
         url4 = data["secure_media"]["reddit_video"]["fallback_url"]
-        url3 = re.sub(r"(1080|720|480|360|240)", "audio", url4)
+        id = url4.split("/")[3]
+        url3 = f"https://v.redd.it/{id}/DASH_AUDIO_128.mp4"
 
         try:
             vid_dl(url4, url3, chatid, postid, title, dims)
