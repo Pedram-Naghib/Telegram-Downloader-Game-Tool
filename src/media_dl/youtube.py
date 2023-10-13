@@ -51,9 +51,8 @@ def audio_extract(msg: Message):
 
 @ bot.message_handler(regexp=r'https?://.*youtu\S+')
 def utubelink(msg: Message, def_res=None):
-    bot.send_chat_action(chatid, 'upload_video')
-    
     msgid, chatid, url = msg.message_id, msg.chat.id, msg.text
+    bot.send_chat_action(chatid, 'upload_video')
     resol = mongo.reader(msg.from_user.id, "resolution", '720')
     res = def_res if def_res else resol
     res_index = RESES.index(res)
